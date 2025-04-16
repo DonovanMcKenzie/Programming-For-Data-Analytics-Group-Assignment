@@ -47,7 +47,7 @@ while runtime == 1:
         
     if start_bttn.draw(screen):
         import gameselect
-        open_file(gameselect)
+        
     
     #below is the event handler
     for event in pygame.event.get():
