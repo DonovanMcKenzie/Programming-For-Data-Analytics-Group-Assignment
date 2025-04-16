@@ -1,15 +1,7 @@
 """
 Snakes and Ladders Game
-Author: [Your Name]
-This project includes use of:
-• Random number generation
-• Strings, lists, concatenation
-• Object-Oriented Programming (classes and methods)
-• Exception Handling
-• Game statistics (mean, mode, median, count, range, min, max)
-• Modular, reusable code
+Author: Khamani Brown #2408880
 """
-
 import pygame
 import random
 import time
@@ -165,14 +157,18 @@ def game_loop():
                     if next_pos <= 100:
                         animate_movement(current_player, next_pos)
 
-                    # Check for snake or ladder
-                    tile = current_player.position
-                    if tile in snakes:
-                        display_text_centered(f"Oh no! {current_player.name} hit a snake!")
-                        animate_movement(current_player, snakes[tile])
-                    elif tile in ladders:
-                        display_text_centered(f"Yay! {current_player.name} climbed a ladder!")
-                        animate_movement(current_player, ladders[tile])
+                # Check for snake or ladder AFTER the move
+tile = current_player.position
+
+if tile in snakes:
+    end_tile = snakes[tile]
+    display_text_centered(f"Oh no! {current_player.name} hit a snake!")
+    animate_movement(current_player, end_tile)
+
+elif tile in ladders:
+    end_tile = ladders[tile]
+    display_text_centered(f"Yay! {current_player.name} climbed a ladder!")
+    animate_movement(current_player, end_tile)
 
                     if current_player.position == 100:
                         display_text_centered(f"{current_player.name} wins!")
