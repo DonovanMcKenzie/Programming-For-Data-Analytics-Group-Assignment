@@ -23,6 +23,7 @@ class Button():
         #resets the button after a click        
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
+            
                 
         #this part actually draws the button
         surface.blit(self.image, (self.rect.x, self.rect.y))
