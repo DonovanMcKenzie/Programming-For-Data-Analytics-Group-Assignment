@@ -24,11 +24,14 @@ font = pygame.font.SysFont("arial", 20)
 # Player setup
 player_pos = 1
 player_color = RED
-player_name = "Player 1"  # Default name
+player_name = ""  # Player name will be set by user input
 
 # Snakes and Ladders map
 snakes = {16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 98: 78}
 ladders = {1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 36: 44, 51: 67, 71: 91, 80: 100}
+
+# Initialize sounds
+dice_roll_sound = pygame.mixer.Sound("dice_roll.wav")  # Add your dice roll sound file here
 
 def draw_board():
     screen.fill(WHITE)
@@ -65,20 +68,21 @@ def animate_movement(start, end):
         pygame.time.delay(300)  # pause for 300ms between moves
 
 def animate_dice_roll():
-    # Simulate dice roll animation (shaking dice)
     roll_result = random.randint(1, 6)
     for _ in range(10):  # Shake the dice a few times
         screen.fill(WHITE)
         draw_board()
         dice_text = font.render(str(roll_result), True, BLACK)
-        screen.blit(dice_text, (WIDTH // 2 - 10, HEIGHT // 2 - 10))
+        dice_text = pygame.font.SysFont("arial", 60).render(str(roll_result), True, BLACK)  # Larger text for visibility
+        screen.blit(dice_text, (WIDTH // 2 - 30, HEIGHT // 2 - 30))
         pygame.display.update()
         pygame.time.delay(100)
         roll_result = random.randint(1, 6)  # Update dice number
+    dice_roll_sound.play()  # Play dice roll sound
     return roll_result
 
 def draw_player_name():
-    name_text = font.render(f"{player_name}", True, BLACK)
+    name_text = pygame.font.SysFont("arial", 30).render(f"{player_name}", True, BLACK)
     screen.blit(name_text, (WIDTH // 2 - 50, HEIGHT - 30))
 
 def handle_snakes_ladders():
@@ -91,9 +95,36 @@ def handle_snakes_ladders():
         return True
     return False
 
+def get_player_name():
+    global player_name
+    running = True
+    input_active = False
+    name = ''
+    while running:
+        screen.fill(WHITE)
+        draw_board()
+        name_text = pygame.font.SysFont("arial", 40).render(f"Enter Player Name: {name}", True, BLACK)
+        screen.blit(name_text, (WIDTH // 2 - 150, HEIGHT // 2 - 40))
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    player_name = name
+                    return
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    name += event.unicode
+
 # Game loop
 running = True
 clock = pygame.time.Clock()
+
+# Get player name before starting the game
+get_player_name()
 
 while running:
     draw_board()
