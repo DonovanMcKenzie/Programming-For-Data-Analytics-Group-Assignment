@@ -16,6 +16,8 @@ BLACK = (0, 0, 0)
 BLUE = (100, 149, 237)
 GREEN = (34, 177, 76)
 RED = (200, 0, 0)
+SNAKE_COLOR = (255, 0, 0)  # Red for snakes
+LADDER_COLOR = (0, 255, 0)  # Green for ladders
 
 # Board setup
 TILE_SIZE = WIDTH // 10
@@ -30,6 +32,9 @@ player_name = ""  # Player name will be set by user input
 snakes = {16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 98: 78}
 ladders = {1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 36: 44, 51: 67, 71: 91, 80: 100}
 
+# Initialize sounds
+# dice_roll_sound = pygame.mixer.Sound("dice_roll.wav")  # Sound removed as per request
+
 def draw_board():
     screen.fill(WHITE)
     number = 1
@@ -41,6 +46,22 @@ def draw_board():
             num_text = font.render(str(number), True, BLACK)
             screen.blit(num_text, (x + 5, y + 5))
             number += 1
+    
+    # Draw snakes and ladders
+    draw_snakes_and_ladders()
+
+def draw_snakes_and_ladders():
+    # Draw snakes
+    for start, end in snakes.items():
+        start_x, start_y = get_tile_center(start)
+        end_x, end_y = get_tile_center(end)
+        pygame.draw.line(screen, SNAKE_COLOR, (start_x, start_y), (end_x, end_y), 4)
+
+    # Draw ladders
+    for start, end in ladders.items():
+        start_x, start_y = get_tile_center(start)
+        end_x, end_y = get_tile_center(end)
+        pygame.draw.line(screen, LADDER_COLOR, (start_x, start_y), (end_x, end_y), 4)
 
 def get_tile_center(tile):
     row = (tile - 1) // 10
@@ -69,13 +90,11 @@ def animate_dice_roll():
     for _ in range(10):  # Shake the dice a few times
         screen.fill(WHITE)
         draw_board()
-        dice_text = font.render(str(roll_result), True, BLACK)
         dice_text = pygame.font.SysFont("arial", 60).render(str(roll_result), True, BLACK)  # Larger text for visibility
         screen.blit(dice_text, (WIDTH // 2 - 30, HEIGHT // 2 - 30))
         pygame.display.update()
         pygame.time.delay(100)
         roll_result = random.randint(1, 6)  # Update dice number
-    dice_roll_sound.play()  # Play dice roll sound
     return roll_result
 
 def draw_player_name():
