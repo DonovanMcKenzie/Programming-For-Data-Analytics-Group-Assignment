@@ -2,8 +2,9 @@
 #https://stackoverflow.com/questions/tagged/pygame| and on youtube 'Coding with Russ', great tutorials' |
 
 import pygame
-from ..shared import buttons#error importing here, will fix
 pygame.init()
+import buttons
+#while i tried my darndest to get python to register the folder as a directory by creating __init__.py files, it refuses to see it. so i will default to the simplest option, pasting the buttons module into every folder that has code that wants to use it. i refuse to burn anymore time
 
 screen_width = 1500
 screen_height = 754
