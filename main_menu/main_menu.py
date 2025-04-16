@@ -5,6 +5,7 @@ import pygame
 pygame.init()
 import buttons
 import webbrowser
+
 #while i tried my darndest to get python to register the folder as a directory by creating __init__.py files, it refuses to see it. so i will default to the simplest option, pasting the buttons module into every folder that has code that wants to use it. i refuse to burn anymore time
 
 screen_width = 1500
@@ -28,8 +29,8 @@ repo = 'https://github.com/DonovanMcKenzie/Programming-For-Data-Analytics-Group-
 start_bttn = buttons.Button(588, 327, start_img)
 quit_bttn = buttons.Button(621, 460, quit_img)
 vinfo = buttons.Button(4, 702, vinfo_img)
-    
-    
+
+
 
 runtime = 1
 #gameloop runtime variable
@@ -37,21 +38,24 @@ runtime = 1
 while runtime == 1:
 #gameloop
     
-    #now we call the instances of buttons to the screen
-    if start_bttn.draw(screen):
-        print(f"head to game selection screen")
-        
+    #now we call the instances of buttons to the screen     
     if quit_bttn.draw(screen):
         runtime = 0
         
     if vinfo.draw(screen):
         webbrowser.open(repo)
+        
+    if start_bttn.draw(screen):
+        import gameselect
+        
     
     #below is the event handler
     for event in pygame.event.get():
         #this checks for the X being pressed to close the window
         if event.type == pygame.QUIT:
             runtime = 0
+
+            
             
     screen.blit(main_menu_bg_img, (0, 0))
     
