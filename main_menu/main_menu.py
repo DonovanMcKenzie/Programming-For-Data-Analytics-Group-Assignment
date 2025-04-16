@@ -2,7 +2,7 @@
 #https://stackoverflow.com/questions/tagged/pygame| and on youtube 'Coding with Russ', great tutorials' |
 
 import pygame
-from .shared import buttons
+from ..shared import buttons#error importing here, will fix
 pygame.init()
 
 screen_width = 1500
