@@ -4,6 +4,7 @@
 import pygame
 pygame.init()
 import buttons
+import webbrowser
 #while i tried my darndest to get python to register the folder as a directory by creating __init__.py files, it refuses to see it. so i will default to the simplest option, pasting the buttons module into every folder that has code that wants to use it. i refuse to burn anymore time
 
 screen_width = 1500
@@ -20,7 +21,8 @@ quit_img = pygame.image.load('main_menu_assets\Quit.png').convert_alpha()
 vinfo_img = pygame.image.load('main_menu_assets/version info.png').convert_alpha()
 #imports images to use as buttons on screen. the .convert_alpha() preserves the transparency of png images
 
-        
+repo = 'https://github.com/DonovanMcKenzie/Programming-For-Data-Analytics-Group-Assignment'
+#link to repository for version info button
         
 #below are button instances of the button
 start_bttn = buttons.Button(588, 327, start_img)
@@ -43,7 +45,7 @@ while runtime == 1:
         runtime = 0
         
     if vinfo.draw(screen):
-        print(f"paste code for github")
+        webbrowser.open(repo)
     
     #below is the event handler
     for event in pygame.event.get():
