@@ -73,4 +73,4 @@ def draw_board():
         for col in range(10):
             x = col * TILE_SIZE if row % 2 == 0 else (9 - col) * TILE_SIZE
             y = 9 * TILE_SIZE - row * TILE_SIZE
-            pygame.draw.rect(screen, BLUE, (x, y,
+            pygame.draw.rect(screen, BLUE, (x, y,)
