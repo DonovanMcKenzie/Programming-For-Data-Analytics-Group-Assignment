@@ -1,12 +1,26 @@
+"""
+Snakes and Ladders Game
+Author: [Your Name]
+This project includes use of:
+• Random number generation
+• Strings, lists, concatenation
+• Object-Oriented Programming (classes and methods)
+• Exception Handling
+• Game statistics (mean, mode, median, count, range, min, max)
+• Modular, reusable code
+"""
+
 import pygame
 import random
 import time
+import statistics
 
-# Initialize pygame
+# Initialize Pygame
 pygame.init()
 
 # Screen setup
 WIDTH, HEIGHT = 820, 820
+TILE_SIZE = WIDTH // 10
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snakes and Ladders")
 
@@ -16,20 +30,18 @@ BLACK = (0, 0, 0)
 BLUE = (100, 149, 237)
 GREEN = (34, 177, 76)
 RED = (200, 0, 0)
+YELLOW = (255, 215, 0)
 
-# Board setup
-TILE_SIZE = WIDTH // 10
+# Fonts
 font = pygame.font.SysFont("arial", 20)
-
-# Player setup
-player_pos = 1
-player_color = RED
-player_name = ""  # Player name will be set by user input
+big_font = pygame.font.SysFont("arial", 36)
 
 # Snakes and Ladders map
 snakes = {16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 98: 78}
 ladders = {1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 36: 44, 51: 67, 71: 91, 80: 100}
 
+
+# Helper functions
 def draw_board():
     screen.fill(WHITE)
     number = 1
@@ -37,10 +49,19 @@ def draw_board():
         for col in range(10):
             x = col * TILE_SIZE if row % 2 == 0 else (9 - col) * TILE_SIZE
             y = 9 * TILE_SIZE - row * TILE_SIZE
-            pygame.draw.rect(screen, BLUE, (x, y, TILE_SIZE, TILE_SIZE), 1)
+            pygame.draw.rect(screen, BLUE, (x, y, TILE_SIZE, TILE_SIZE), 2)
             num_text = font.render(str(number), True, BLACK)
             screen.blit(num_text, (x + 5, y + 5))
             number += 1
+
+    # Draw snakes
+    for start, end in snakes.items():
+        pygame.draw.line(screen, RED, get_tile_center(start), get_tile_center(end), 4)
+
+    # Draw ladders
+    for start, end in ladders.items():
+        pygame.draw.line(screen, GREEN, get_tile_center(start), get_tile_center(end), 4)
+
 
 def get_tile_center(tile):
     row = (tile - 1) // 10
@@ -51,100 +72,148 @@ def get_tile_center(tile):
     y = (9 - row) * TILE_SIZE + TILE_SIZE // 2
     return x, y
 
-def draw_player(tile):
-    x, y = get_tile_center(tile)
-    pygame.draw.circle(screen, player_color, (x, y), TILE_SIZE // 4)
 
-def animate_movement(start, end):
-    global player_pos
-    for step in range(start + 1, end + 1):
-        player_pos = step
+def animate_movement(player, end):
+    for step in range(player.position + 1, end + 1):
+        player.position = step
         draw_board()
-        draw_player(player_pos)
+        draw_player(player1)
+        draw_player(player2)
+        display_names()
         pygame.display.update()
-        pygame.time.delay(300)  # pause for 300ms between moves
+        pygame.time.delay(200)
 
-def animate_dice_roll():
-    roll_result = random.randint(1, 6)
-    for _ in range(10):  # Shake the dice a few times
-        screen.fill(WHITE)
-        draw_board()
-        dice_text = font.render(str(roll_result), True, BLACK)
-        dice_text = pygame.font.SysFont("arial", 60).render(str(roll_result), True, BLACK)  # Larger text for visibility
-        screen.blit(dice_text, (WIDTH // 2 - 30, HEIGHT // 2 - 30))
-        pygame.display.update()
-        pygame.time.delay(100)
-        roll_result = random.randint(1, 6)  # Update dice number
-    dice_roll_sound.play()  # Play dice roll sound
-    return roll_result
 
-def draw_player_name():
-    name_text = pygame.font.SysFont("arial", 30).render(f"{player_name}", True, BLACK)
-    screen.blit(name_text, (WIDTH // 2 - 50, HEIGHT - 30))
+def draw_player(player):
+    x, y = get_tile_center(player.position)
+    pygame.draw.circle(screen, player.color, (x, y), TILE_SIZE // 4)
 
-def handle_snakes_ladders():
-    global player_pos
-    new_pos = snakes.get(player_pos, ladders.get(player_pos, player_pos))
-    if new_pos != player_pos:
-        # Animate the player moving on a snake or ladder
-        animate_movement(player_pos, new_pos)
-        player_pos = new_pos
-        return True
-    return False
 
-def get_player_name():
-    global player_name
+def display_names():
+    p1 = font.render(f"{player1.name}: {player1.position}", True, RED)
+    p2 = font.render(f"{player2.name}: {player2.position}", True, YELLOW)
+    screen.blit(p1, (10, 10))
+    screen.blit(p2, (10, 40))
+
+
+def roll_dice():
+    return random.randint(1, 6)
+
+
+def display_text_centered(text):
+    surface = big_font.render(text, True, BLACK)
+    rect = surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(surface, rect)
+    pygame.display.update()
+    pygame.time.delay(1000)
+
+
+def calculate_stats(scores):
+    if not scores:
+        return None
+    try:
+        return {
+            "mean": round(statistics.mean(scores), 2),
+            "median": statistics.median(scores),
+            "mode": statistics.mode(scores) if len(set(scores)) < len(scores) else "No mode",
+            "min": min(scores),
+            "max": max(scores),
+            "range": max(scores) - min(scores),
+            "count": len(scores)
+        }
+    except Exception as e:
+        print(f"Stats Error: {e}")
+        return {}
+
+
+# Player class
+class Player:
+    def __init__(self, name, color):
+        self.name = name
+        self.color = color
+        self.position = 1
+        self.scores = []
+
+    def reset(self):
+        self.position = 1
+
+
+# Main loop
+def game_loop():
+    turn = 0
     running = True
-    input_active = False
-    name = ''
+    winner = None
+
     while running:
-        screen.fill(WHITE)
         draw_board()
-        name_text = pygame.font.SysFont("arial", 40).render(f"Enter Player Name: {name}", True, BLACK)
-        screen.blit(name_text, (WIDTH // 2 - 150, HEIGHT // 2 - 40))
+        draw_player(player1)
+        draw_player(player2)
+        display_names()
         pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                return False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    player_name = name
-                    return
-                elif event.key == pygame.K_BACKSPACE:
-                    name = name[:-1]
-                else:
-                    name += event.unicode
+                if event.key == pygame.K_SPACE:
+                    current_player = player1 if turn % 2 == 0 else player2
+                    roll = roll_dice()
 
-# Game loop
-running = True
-clock = pygame.time.Clock()
+                    display_text_centered(f"{current_player.name} rolled a {roll}")
+                    next_pos = current_player.position + roll
 
-# Get player name before starting the game
-get_player_name()
+                    if next_pos <= 100:
+                        animate_movement(current_player, next_pos)
 
-while running:
-    draw_board()
-    draw_player(player_pos)
-    draw_player_name()
-    pygame.display.update()
-    clock.tick(60)
+                    # Check for snake or ladder
+                    tile = current_player.position
+                    if tile in snakes:
+                        display_text_centered(f"Oh no! {current_player.name} hit a snake!")
+                        animate_movement(current_player, snakes[tile])
+                    elif tile in ladders:
+                        display_text_centered(f"Yay! {current_player.name} climbed a ladder!")
+                        animate_movement(current_player, ladders[tile])
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+                    if current_player.position == 100:
+                        display_text_centered(f"{current_player.name} wins!")
+                        current_player.scores.append(turn + 1)
+                        winner = current_player
+                        running = False
+                    turn += 1
+        pygame.time.Clock().tick(60)
+    return True
 
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                # Animate the dice roll and get the result
-                roll_result = animate_dice_roll()
-                next_pos = player_pos + roll_result
-                if next_pos <= 100:
-                    animate_movement(player_pos, next_pos)
-                    player_pos = next_pos
 
-                    # Handle snakes and ladders after moving
-                    if handle_snakes_ladders():
-                        pygame.time.delay(300)  # Pause for a moment after snake/ladder
+# Ask for names
+name1 = input("Enter Player 1 Name: ")
+name2 = input("Enter Player 2 Name: ")
+
+player1 = Player(name1 or "Player 1", RED)
+player2 = Player(name2 or "Player 2", YELLOW)
+
+# Play multiple games
+all_scores = []
+keep_playing = True
+
+while keep_playing:
+    player1.reset()
+    player2.reset()
+    keep_playing = game_loop()
+
+    all_scores.extend(player1.scores + player2.scores)
+
+    print("\nGame Over! Scores:")
+    print(f"{player1.name}: {player1.scores}")
+    print(f"{player2.name}: {player2.scores}")
+
+    stats = calculate_stats(all_scores)
+    if stats:
+        print("\nGame Stats:")
+        for k, v in stats.items():
+            print(f"{k.capitalize()}: {v}")
+
+    choice = input("\nPlay again? (y/n): ").lower()
+    if choice != 'y':
+        break
 
 pygame.quit()
