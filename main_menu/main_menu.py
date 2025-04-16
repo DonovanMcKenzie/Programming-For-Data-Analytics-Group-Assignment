@@ -5,9 +5,12 @@ import pygame
 pygame.init()
 
 screen_width = 1500
-screen_height = 820
+screen_height = 754
 
 screen = pygame.display.set_mode((screen_width, screen_height))
+
+main_menu_bg_img = pygame.image.load('main_menu_assets\main background.png')
+#imports the background image (yes i drew it in Ms paint sue me)
 
 runtime = 1
 #gameloop runtime variable
@@ -19,6 +22,8 @@ while runtime == 1:
         if event.type == pygame.QUIT:
             runtime = 0
     #exit code definition
+            
+    screen.blit(main_menu_bg_img, (0, 0))
     
     pygame.display.update()
     #screen upkeep
