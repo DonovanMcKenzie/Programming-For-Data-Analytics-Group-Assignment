@@ -45,7 +45,7 @@ to_mainBttn = pygame.image.load('dd_assets/to main.png')
 exitgame = pygame.image.load('dd_assets/gamequit.png')
 level1img = pygame.image.load('dd_assets/level1_img.png')
 level2img = pygame.image.load('dd_assets/level2_img.png')
-winbanner = pygame.image.load('dd_assets/game win.png')
+winbanner_img = pygame.image.load('dd_assets/game win.png')
 
 
 class Player():
@@ -326,7 +326,6 @@ unpause = Button(100, 100, unpause_bttn)
 mainBttn = Button(200, 200, to_mainBttn)
 exitgamebttn = Button(300, 300, exitgame)
 
-winbanner_img = Button(screen_height // 2, screen_width // 2, winbanner)
 
 level1_bttn = Button(100, 100, level1img)
 level2_bttn = Button(200, 200, level2img)
@@ -425,9 +424,8 @@ while runtime == 1:
                 gamestate = "win"
         
         if gamestate == "win":
-            winbanner_img.draw()
+            screen.blit(winbanner_img, (10, 10))
     
-    draw_grid()
     
     #event handler including paused
     for event in pygame.event.get():
