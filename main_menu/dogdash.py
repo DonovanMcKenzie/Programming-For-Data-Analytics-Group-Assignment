@@ -45,6 +45,7 @@ to_mainBttn = pygame.image.load('dd_assets/to main.png')
 exitgame = pygame.image.load('dd_assets/gamequit.png')
 level1img = pygame.image.load('dd_assets/level1_img.png')
 level2img = pygame.image.load('dd_assets/level2_img.png')
+winbanner = pygame.image.load('dd_assets/game win.png')
 
 
 class Player():
@@ -125,6 +126,9 @@ class Player():
             if pygame.sprite.spritecollide(self, spikesup_group, False):
                 gameover = -1
                 
+            if pygame.sprite.spritecollide(self, kennel_group, False):
+                gameover = 1
+                
             #update player position 
             self.rect.x += dx
             self.rect.y += dy
@@ -198,6 +202,9 @@ class World():
                     #creating an instance of the spikes class
                     spikesup = Spikes(col_count * tile_size, row_count * tile_size + (tile_size // 2))
                     spikesup_group.add(spikesup)
+                if tile == 6:
+                    kennel = Kennel(col_count * tile_size, row_count * tile_size)
+                    kennel_group.add(kennel)
                 col_count += 1
             row_count += 1
 
@@ -229,6 +236,15 @@ class Spikes(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         spike_img = pygame.image.load('dd_assets/spikesup.png')
         self.image = pygame.transform.scale(spike_img, (tile_size, tile_size // 2))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+class Kennel(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        kennel_img = pygame.image.load('dd_assets/kennel.png')
+        self.image = pygame.transform.scale(kennel_img, (tile_size, tile_size))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -269,11 +285,11 @@ class Button():
 world_datalvl1 = [
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 2, 0, 7, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 7, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 1], 
+[1, 6, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 1], 
 [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
@@ -310,13 +326,15 @@ unpause = Button(100, 100, unpause_bttn)
 mainBttn = Button(200, 200, to_mainBttn)
 exitgamebttn = Button(300, 300, exitgame)
 
+winbanner_img = Button(screen_height // 2, screen_width // 2, winbanner)
+
 level1_bttn = Button(100, 100, level1img)
 level2_bttn = Button(200, 200, level2img)
 
 player_lab = Player(100, screen_height - 90)
 meanboar_group = pygame.sprite.Group()
 spikesup_group = pygame.sprite.Group()
-
+kennel_group = pygame.sprite.Group()
 
 #game paths
 curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -378,7 +396,7 @@ while runtime == 1:
                 gamestate = "playing"
             
             
-        else:
+        if gamestate == "playing":
             #regular game loop
             player_lab.update(gameover)#calls the update method from the player class to draw the lab
             
@@ -387,6 +405,8 @@ while runtime == 1:
               
             spikesup_group.draw(screen)
             
+            kennel_group.draw(screen)
+            
             gameover = player_lab.update(gameover)
             
             #player has died
@@ -394,10 +414,18 @@ while runtime == 1:
                 if restart.draw():
                     player_lab.reset(100, screen_height - 90)
                     gameover = 0
-                
+                    
                 if back.draw():
                     subprocess.Popen(["python", menu_path])
-                    runtime = 0            
+                    runtime = 0
+                    
+            #level complete?
+            if gameover == 1:
+                #display win screen, compute coins collected, offer coin minigame
+                gamestate = "win"
+        
+        if gamestate == "win":
+            winbanner_img.draw()
     
     draw_grid()
     
