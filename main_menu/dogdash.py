@@ -1,4 +1,7 @@
 import pygame
+import os
+import subprocess
+import sys
 from pygame.locals import *
 
 pygame.init()
@@ -285,7 +288,9 @@ spikesup_group = pygame.sprite.Group()
 
 world = World(world_data)
 
-
+#game paths
+curr_dir = os.path.dirname(os.path.abspath(__file__))
+menu_path = os.path.join(curr_dir, "combinedmenu.py")
 
 runtime = 1
 #run var to control game execution
@@ -321,7 +326,10 @@ while runtime == 1:
         if restart.draw():
             player_lab.reset(100, screen_height - 90)
             gameover = 0
-        back.draw()
+        
+        if back.draw():
+            subprocess.Popen(["python", menu_path])
+            runtime = 0            
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -332,4 +340,5 @@ while runtime == 1:
 #updates our screen to keep the code looping
             
 pygame.quit()
+sys.exit()
     

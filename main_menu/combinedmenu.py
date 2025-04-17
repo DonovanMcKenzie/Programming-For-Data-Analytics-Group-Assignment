@@ -2,12 +2,13 @@
 #https://stackoverflow.com/questions/tagged/pygame| and on youtube 'Coding with Russ', great tutorials' |
 
 import pygame
-pygame.init()
 import buttons
 import webbrowser #necessary for the version info button
 import subprocess #necessary to give functionality to the buttons switching from menu to game and vice versa
 import os #same as above
+import sys
 
+pygame.init()
 
 screen_width = 1500
 screen_height = 754
@@ -89,9 +90,6 @@ while runtime == 1:
             print(f"domino")
         if back_bttn.draw(screen):
             menustate = "main"
-        
-        
-        
     
     #below is the event handler
     for event in pygame.event.get():
@@ -106,3 +104,4 @@ while runtime == 1:
     
 pygame.quit()
 #exit pygame execution
+sys.exit()
