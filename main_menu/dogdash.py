@@ -424,7 +424,7 @@ while runtime == 1:
                 gamestate = "win"
         
         if gamestate == "win":
-            screen.blit(winbanner_img, (10, 10))
+            screen.blit(winbanner_img, (100, 100))
     
     
     #event handler including paused
