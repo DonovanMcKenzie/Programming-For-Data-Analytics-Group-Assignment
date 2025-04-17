@@ -4,6 +4,10 @@ from pygame.locals import *
 pygame.init()
 #initializes pygames modules for actual game functions
 
+clock = pygame.time.Clock()
+fps = 60
+#initalizes an ingame clock and frame rate to control how often the gameplay loop runs
+
 screen_width = 1500
 screen_height = 700
 #defines screen measurements
@@ -14,6 +18,7 @@ pygame.display.set_caption('Dog Dash')
 
 #gamevariables below credits to AxulArt @ https://axulart.itch.io/dirt-grass-2d-platform-tileset-ver-2
 tile_size = 50
+
 
 '''def draw_grid():
     for line in range(0, 30):
@@ -57,29 +62,64 @@ class World():
 
 class Player():
     def __init__(self, x, y):
-        player_img = pygame.image.load('dd_assets/Labradorstand.png').convert_alpha()
-        self.image = pygame.transform.scale(player_img, (50, 40))#36, 24
+        self.images_moveright = [] #empty list to store individual images in an animation cycle
+        self.images_moveleft = []
+        self.index = 0
+        self.counter = 0
+        # iterates through images to load them, appends the image to the empty list
+        for num in range (1, 9):
+            lab_move_r = pygame.image.load(f"dd_assets/Lab{num}.png")
+            lab_move_r = pygame.transform.scale(lab_move_r, (50, 40))
+            lab_move_l = pygame.transform.flip(lab_move_r, True, False)
+            self.images_moveright.append(lab_move_r)
+            self.images_moveleft.append(lab_move_l)
+        self.image = self.images_moveright[self.index]
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.yvelocity = 0
         self.isjumping = 0
+        self.facing = 0
         
     def update(self):
         dx = 0
         dy = 0
+        walkrate = 12
         
         #logs keystrokes to act as controls
         key = pygame.key.get_pressed()
-        if key[pygame.K_LEFT]:
-            dx -= 5
-        if key[pygame.K_RIGHT]:
-            dx += 5
         if key[pygame.K_UP] and self.isjumping == 0:
             self.yvelocity = -12
             self.isjumping = 1
         if key[pygame.K_UP] == 0:
             self.isjumping = 0
+            
+        if key[pygame.K_LEFT]:
+            dx -= 5
+            self.counter +=1 #increments when pressing directional keys to progress animation
+            self.facing = -1
+        if key[pygame.K_RIGHT]:
+            dx += 5
+            self.counter +=1
+            self.facing = 1
+        if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
+            self.counter = 0
+            self.index = 0
+            if self.facing == 1:
+                self.image = self.images_moveright[self.index]
+            if self.facing == -1:
+                self.image = self.images_moveleft[self.index]
+            
+        #doge animations
+        if self.counter > walkrate:
+            self.counter = 0
+            self.index += 1
+            if self.index >= len(self.images_moveright):
+                self.index = 0 #keeps the value of self .index from exceeding # of images in list
+            if self.facing == 1:
+                self.image = self.images_moveright[self.index]
+            if self.facing == -1:
+                self.image = self.images_moveleft[self.index]
             
         #gravity calculations
         self.yvelocity += 1
@@ -133,6 +173,7 @@ lvlbg = pygame.image.load('dd_assets/mainlvlbg.png')
 while runtime == 1:
 #gameloop 
     
+    clock.tick(fps)# sets a frame rate for the execution
     screen.blit(lvlbg, (0,0))
     #here we draw the bg image on screen
       
