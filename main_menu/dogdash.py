@@ -28,32 +28,17 @@ gameover = 0
 '''
 
 
+#loaded images below
+lvlbg = pygame.image.load('dd_assets/mainlvlbg.png')
+restart_img = pygame.image.load('dd_assets/restartimg.png')
+back_img = pygame.image.load('dd_assets/back bttn.png')
+
+
 
 
 class Player():
     def __init__(self, x, y):
-        self.images_moveright = [] #empty list to store individual images in an animation cycle
-        self.images_moveleft = []
-        self.index = 0
-        self.counter = 0
-        # iterates through images to load them, appends the image to the empty list
-        for num in range (1, 9):
-            lab_move_r = pygame.image.load(f"dd_assets/Lab{num}.png")
-            lab_move_r = pygame.transform.scale(lab_move_r, (40, 30))
-            lab_move_l = pygame.transform.flip(lab_move_r, True, False)
-            self.images_moveright.append(lab_move_r)
-            self.images_moveleft.append(lab_move_l)
-        self.dead = pygame.image.load(f"dd_assets/dead.png")
-        self.dead = pygame.transform.scale(self.dead, (40, 30))
-        self.image = self.images_moveright[self.index]
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.width = self.image.get_width()
-        self.height = self.image.get_height()
-        self.yvelocity = 0 #calculates gravity/vertical acceleration, a negative value means up
-        self.isjumping = 0
-        self.facing = 0
+        self.reset(x,y)
         
     def update(self, gameover ):
         dx = 0 #these measure changes in position b4 they are updated in player pos
@@ -62,7 +47,7 @@ class Player():
         #keypress
         if gameover == 0:
             key = pygame.key.get_pressed()
-            if key[pygame.K_UP] and self.isjumping == 0:
+            if key[pygame.K_UP] and self.isjumping == 0 and self.airtime == False:
                 self.yvelocity = -14
                 self.isjumping = 1
             if key[pygame.K_UP] == 0:
@@ -104,6 +89,7 @@ class Player():
             dy += self.yvelocity
             
             #check for collisions
+            self.airtime = True
             for tile in world.tile_list:
                 #x axis collision
                 if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
@@ -119,12 +105,12 @@ class Player():
                     elif self.yvelocity >= 0:
                         dy = tile[1].top - self.rect.bottom #sets the allowable change in y value to the position right b4 collision with a block
                         self.yvelocity =0
+                        self.airtime = False
                         
             #check for hostile contact
             if pygame.sprite.spritecollide(self, meanboar_group, False):
                 gameover = -1
         
-            
             if pygame.sprite.spritecollide(self, spikesup_group, False):
                 gameover = -1
                 
@@ -141,7 +127,32 @@ class Player():
         screen.blit(self.image, self.rect)
         pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
         
-        return gameover        
+        return gameover
+    
+    def reset(self, x, y):
+        self.images_moveright = [] #empty list to store individual images in an animation cycle
+        self.images_moveleft = []
+        self.index = 0
+        self.counter = 0
+        # iterates through images to load them, appends the image to the empty list
+        for num in range (1, 9):
+            lab_move_r = pygame.image.load(f"dd_assets/Lab{num}.png")
+            lab_move_r = pygame.transform.scale(lab_move_r, (40, 30))
+            lab_move_l = pygame.transform.flip(lab_move_r, True, False)
+            self.images_moveright.append(lab_move_r)
+            self.images_moveleft.append(lab_move_l)
+        self.dead = pygame.image.load(f"dd_assets/dead.png")
+        self.dead = pygame.transform.scale(self.dead, (40, 30))
+        self.image = self.images_moveright[self.index]
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+        self.yvelocity = 0 #calculates gravity/vertical acceleration, a negative value means up
+        self.isjumping = 0
+        self.facing = 0
+        self.airtime = True
 
 class World():
     def __init__(self, data):
@@ -211,6 +222,37 @@ class Spikes(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
             
+            
+class Button():
+    def __init__(self, x, y, image):
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.rect.topleft = (x, y)#sets the coords for the shape
+        self.clicked = False
+        
+    
+    def draw(self):
+        action = False #used later to differentiate button clicks
+        #below stores the position of the mouse in the game window
+        pos = pygame.mouse.get_pos()
+        
+        #this checks if the mouse is over a button and registers clicks
+        if self.rect.collidepoint(pos) == True:#if at any point theres a collision between the defined rectangle's coords and the mouse
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:#checks for left click, 1 is middle and 2 is right
+                self.clicked = True
+                action = True
+                
+        #resets the button after a click        
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+            
+                
+        #this part actually draws the button
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+        
+        return action
 
 
 world_data = [
@@ -232,14 +274,14 @@ world_data = [
 
 
 
-#here we implement an instance of the player class
-player_lab = Player(100, screen_height - 90)
 
-#initalizes boar goup
+#instances
+restart = Button(650, 100, restart_img)
+back = Button(720, 200, back_img)
+
+player_lab = Player(100, screen_height - 90)
 meanboar_group = pygame.sprite.Group()
-#inits spike group, must be done b4 class
 spikesup_group = pygame.sprite.Group()
-#here we implement the terrain as an instance of the world class
 
 world = World(world_data)
 
@@ -248,8 +290,8 @@ world = World(world_data)
 runtime = 1
 #run var to control game execution
 
-lvlbg = pygame.image.load('dd_assets/mainlvlbg.png')
-#loaded images above   
+
+  
 
 
 while runtime == 1:
@@ -263,6 +305,7 @@ while runtime == 1:
     
     if gameover == 0:
         meanboar_group.update()
+        
     
     player_lab.update(gameover)#calls the update method from the player class to draw the lab
     
@@ -272,6 +315,13 @@ while runtime == 1:
     spikesup_group.draw(screen)
     
     gameover = player_lab.update(gameover)
+    
+    #player has died
+    if gameover == - 1:
+        if restart.draw():
+            player_lab.reset(100, screen_height - 90)
+            gameover = 0
+        back.draw()
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

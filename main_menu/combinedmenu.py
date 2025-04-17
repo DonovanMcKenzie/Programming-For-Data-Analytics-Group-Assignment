@@ -4,9 +4,10 @@
 import pygame
 pygame.init()
 import buttons
-import webbrowser
+import webbrowser #necessary for the version info button
+import subprocess #necessary to give functionality to the buttons switching from menu to game and vice versa
+import os #same as above
 
-#while i tried my darndest to get python to register the folder as a directory by creating __init__.py files, it refuses to see it. so i will default to the simplest option, pasting the buttons module into every folder that has code that wants to use it. i refuse to burn anymore time
 
 screen_width = 1500
 screen_height = 754
@@ -46,6 +47,10 @@ snek_bttn = buttons.Button( 730, 430, snekNladder_img)
 ach_bttn = buttons.Button(36, 37, ach_img)
 back_bttn = buttons.Button(638, 600, back_img)
 
+#game paths
+curr_dir = os.path.dirname(os.path.abspath(__file__))
+dogdash_path = os.path.join(curr_dir, "dogdash.py")
+
 
 runtime = 1
 #gameloop runtime variable
@@ -73,7 +78,9 @@ while runtime == 1:
             print(f"High score")
         
         if dd_bttn.draw(screen):
-            print(f"Doge")
+            dogdash_path = os.path.join(curr_dir, "dogdash.py")
+            subprocess.Popen(["python", dogdash_path])
+            runtime = 0
     
         if snek_bttn.draw(screen):
             print(f"snek")
@@ -98,4 +105,4 @@ while runtime == 1:
     #screen upkeep
     
 pygame.quit()
-#exit code execution
+#exit pygame execution

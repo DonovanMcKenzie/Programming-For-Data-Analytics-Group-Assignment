@@ -2,6 +2,7 @@ import sys
 print(sys.path)
 import pygame
 pygame.init()
+import time
 
 class Button():
     def __init__(self, x, y, image):
@@ -16,6 +17,10 @@ class Button():
         #below stores the position of the mouse in the game window
         pos = pygame.mouse.get_pos()
         
+        #resets the button after a click        
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+        
         #this checks if the mouse is over a button and registers clicks
         if self.rect.collidepoint(pos) == True:#if at any point theres a collision between the defined rectangle's coords and the mouse
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:#checks for left click, 1 is middle and 2 is right
@@ -29,5 +34,6 @@ class Button():
         #this part actually draws the button
         surface.blit(self.image, (self.rect.x, self.rect.y))
         
+        time.sleep(3)
         return action
 
