@@ -20,11 +20,11 @@ pygame.display.set_caption('Dog Dash')
 tile_size = 50
 
 
-'''def draw_grid():
+def draw_grid():
     for line in range(0, 30):
         pygame.draw.line(screen, (255, 255, 255), (0, line * tile_size), (screen_width, line * tile_size))
         pygame.draw.line(screen, (255, 255, 255), (line * tile_size, 0), (line * tile_size, screen_height))
-'''
+
 
 
 class World():
@@ -59,6 +59,8 @@ class World():
     def draw(self):
         for tile in self.tile_list:
             screen.blit(tile[0], tile[1])
+            pygame.draw.rect(screen, (255, 255, 255), tile[1], 2)
+
 
 class Player():
     def __init__(self, x, y):
@@ -69,7 +71,7 @@ class Player():
         # iterates through images to load them, appends the image to the empty list
         for num in range (1, 9):
             lab_move_r = pygame.image.load(f"dd_assets/Lab{num}.png")
-            lab_move_r = pygame.transform.scale(lab_move_r, (50, 40))
+            lab_move_r = pygame.transform.scale(lab_move_r, (40, 30))
             lab_move_l = pygame.transform.flip(lab_move_r, True, False)
             self.images_moveright.append(lab_move_r)
             self.images_moveleft.append(lab_move_l)
@@ -77,14 +79,16 @@ class Player():
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.yvelocity = 0
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+        self.yvelocity = 0 #calculates gravity/vertical acceleration, a negative value means up
         self.isjumping = 0
         self.facing = 0
         
     def update(self):
-        dx = 0
+        dx = 0 #these measure changes in position b4 they are updated in player pos
         dy = 0
-        walkrate = 12
+        walkrate = 14
         
         #logs keystrokes to act as controls
         key = pygame.key.get_pressed()
@@ -127,16 +131,38 @@ class Player():
             self.yvelocity = 10
         dy += self.yvelocity
         
-        #check for collisions and then update player position 
+        #check for collisions
+        for tile in world.tile_list:
+            #x axis collision
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                dx = 0
+            
+            #y axis collision
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                #check if doge hits head when jumping
+                if self.yvelocity < 0:
+                    dy = tile[1].bottom - self.rect.top #sets the allowable change in y value to the position right b4 collision with a block
+                    self.yvelocity =0
+                #check if doge is headed to floor
+                elif self.yvelocity >= 0:
+                    dy = tile[1].top - self.rect.bottom #sets the allowable change in y value to the position right b4 collision with a block
+                    self.yvelocity =0
+        #update player position 
         self.rect.x += dx
         self.rect.y += dy
-        
-        if self.rect.bottom > screen_height:
-            self.rect.bottom = screen_height 
-            dy = 0
-        
         #draws the instance of the player to the screen
         screen.blit(self.image, self.rect)
+        pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
+
+
+
+class Baddies(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('dd_assets/meanboar.png')
+        
+
+
 
 world_data = [
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
