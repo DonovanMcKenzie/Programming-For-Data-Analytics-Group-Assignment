@@ -1,2 +1,2 @@
-grid, width 30
-height 14git
+grid, width 30 blocks
+height 14 blocks
