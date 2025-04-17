@@ -1,0 +1,43 @@
+Instructions for Playing the Game "Jumper"
+
+Objective:
+The goal of the game is to avoid obstacles by jumping over them and achieve the highest score possible. The game tracks your highest score across multiple rounds.
+
+ Controls:
+- Press `SPACE`: Jump to avoid obstacles.
+- Double Jump: Press `SPACE` again while in the air to perform a double jump.
+
+ Gameplay:
+1. Start the Game:
+   - When the game starts, you will see a welcome screen with instructions.
+   - Press any key to begin the game.
+
+2. Avoid Obstacles:
+   - Obstacles will move from right to left across the screen.
+   - Use jumps and double jumps to avoid colliding with the obstacles.
+
+3. Scoring:
+   - Your score increases as you survive longer.
+   - A new obstacle is added every 500 points to increase the challenge.
+
+4. Collision:
+   - If your character collides with an obstacle, the game will pause briefly to show how you lost.
+   - You will then see the "Game Over" screen with your score and the highest score achieved.
+
+5. Restart or Quit:
+   - After losing, you will be prompted to play again:
+     - Press `Y` to restart the game.
+     - Press `N` to quit the game.
+
+Features:
+- Double Jump: You can jump twice while in the air to avoid obstacles.
+- High Score Tracking: The game keeps track of your highest score across multiple rounds.
+- Collision Highlight: When you lose, the game highlights the collision area before showing the "Game Over" screen.
+
+
+Tips:
+- Time your jumps carefully to avoid obstacles.
+- Use the double jump strategically to recover from bad timing.
+- Try to beat your high score in every round!
+
+Enjoy the game! 🎮
