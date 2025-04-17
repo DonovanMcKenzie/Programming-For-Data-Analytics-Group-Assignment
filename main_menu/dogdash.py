@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 from pygame.locals import *
+import pickle
 
 pygame.init()
 #initializes pygames modules for actual game functions
@@ -22,21 +23,28 @@ pygame.display.set_caption('Dog Dash')
 #gamevariables below credits to AxulArt @ https://axulart.itch.io/dirt-grass-2d-platform-tileset-ver-2
 tile_size = 50
 gameover = 0
+menustate = True
+gamestate = "playing"
+level = 0
 
 
-'''def draw_grid():
+def draw_grid():
     for line in range(0, 30):
         pygame.draw.line(screen, (255, 255, 255), (0, line * tile_size), (screen_width, line * tile_size))
         pygame.draw.line(screen, (255, 255, 255), (line * tile_size, 0), (line * tile_size, screen_height))
-'''
+
 
 
 #loaded images below
 lvlbg = pygame.image.load('dd_assets/mainlvlbg.png')
 restart_img = pygame.image.load('dd_assets/restartimg.png')
 back_img = pygame.image.load('dd_assets/back bttn.png')
-
-
+pause_bttn = pygame.image.load('dd_assets/pause.png')
+unpause_bttn = pygame.image.load('dd_assets/unpause.png')
+to_mainBttn = pygame.image.load('dd_assets/to main.png')
+exitgame = pygame.image.load('dd_assets/gamequit.png')
+level1img = pygame.image.load('dd_assets/level1_img.png')
+level2img = pygame.image.load('dd_assets/level2_img.png')
 
 
 class Player():
@@ -212,7 +220,7 @@ class Baddies1(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.direction
         self.movecount += 1
-        if abs(self.movecount) > 100:
+        if abs(self.movecount) > 150:
             self.direction *= -1
             self.movecount *= -1
             
@@ -258,35 +266,57 @@ class Button():
         return action
 
 
-world_data = [
+world_datalvl1 = [
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1], 
-[1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 7, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 7, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 2, 0, 7, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 7, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 1], 
+[1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 2, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
+world_datalvl2 = [
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 2, 0, 7, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-
+]
 
 #instances
 restart = Button(650, 100, restart_img)
 back = Button(720, 200, back_img)
+pause = Button(1455, 6, pause_bttn)
+
+unpause = Button(100, 100, unpause_bttn)
+mainBttn = Button(200, 200, to_mainBttn)
+exitgamebttn = Button(300, 300, exitgame)
+
+level1_bttn = Button(100, 100, level1img)
+level2_bttn = Button(200, 200, level2img)
 
 player_lab = Player(100, screen_height - 90)
 meanboar_group = pygame.sprite.Group()
 spikesup_group = pygame.sprite.Group()
 
-world = World(world_data)
 
 #game paths
 curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -306,32 +336,77 @@ while runtime == 1:
     screen.blit(lvlbg, (0,0))
     #here we draw the bg image on screen
       
-    world.draw()#draws the terrain on screen
     
-    if gameover == 0:
-        meanboar_group.update()
+    
+    if menustate == True:
+        if level1_bttn.draw():
+            level = 1
+            menustate = False
+        if level2_bttn.draw():
+            level = 2
+            menustate = False
+        if exitgamebttn.draw():
+                runtime = 0
+    else:
         
-    
-    player_lab.update(gameover)#calls the update method from the player class to draw the lab
-    
-    
-    meanboar_group.draw(screen)
-      
-    spikesup_group.draw(screen)
-    
-    gameover = player_lab.update(gameover)
-    
-    #player has died
-    if gameover == - 1:
-        if restart.draw():
-            player_lab.reset(100, screen_height - 90)
-            gameover = 0
+        if level == 1:
+            world = World(world_datalvl1)
+        if level == 2:
+            world = World(world_datalvl2)
+
+        world.draw()#draws the terrain on screen
+            
         
-        if back.draw():
-            subprocess.Popen(["python", menu_path])
-            runtime = 0            
+        
+        if gameover == 0:
+            meanboar_group.update()
+        
+        if pause.draw():
+            gamestate = "paused"
+            print(f"paused press")
+       
+       
+       #gamestate checker
+        if gamestate == "paused":
+            if exitgamebttn.draw():
+                runtime = 0
+            
+            if mainBttn.draw():
+                subprocess.Popen(["python", menu_path])
+                runtime = 0
+            if unpause.draw():
+                gamestate = "playing"
+            
+            
+        else:
+            #regular game loop
+            player_lab.update(gameover)#calls the update method from the player class to draw the lab
+            
+            
+            meanboar_group.draw(screen)
+              
+            spikesup_group.draw(screen)
+            
+            gameover = player_lab.update(gameover)
+            
+            #player has died
+            if gameover == - 1:
+                if restart.draw():
+                    player_lab.reset(100, screen_height - 90)
+                    gameover = 0
+                
+                if back.draw():
+                    subprocess.Popen(["python", menu_path])
+                    runtime = 0            
     
+    draw_grid()
+    
+    #event handler including paused
     for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                gamestate = "paused"
+                print(f"paused")
         if event.type == pygame.QUIT:
             runtime = 0
 #serves as the program exit via X'ing the tab
