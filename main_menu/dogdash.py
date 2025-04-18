@@ -9,7 +9,7 @@ pygame.init()
 #initializes pygames modules for actual game functions
 
 clock = pygame.time.Clock()
-fps = 49
+fps = 60
 #initalizes an ingame clock and frame rate to control how often the gameplay loop runs
 
 screen_width = 1500
@@ -24,8 +24,9 @@ pygame.display.set_caption('Dog Dash')
 tile_size = 50
 gameover = 0
 menustate = True
-gamestate = "playing"
+gamestate = "win"
 level = 0
+coincount = 0
 
 def draw_grid():
     for line in range(0, 30):
@@ -56,8 +57,8 @@ class Player():
     def update(self, gameover ):
         dx = 0 #these measure changes in position b4 they are updated in player pos
         dy = 0
-        coincount = 0
-        walkrate = 35
+
+        walkrate = 38
         #keypress
         if gameover == 0:
             key = pygame.key.get_pressed()
@@ -131,9 +132,10 @@ class Player():
             if pygame.sprite.spritecollide(self, kennel_group, False):
                 gameover = 1
                 
-            if pygame.sprite.spritecollide(self, coin_group, True):
+            '''if pygame.sprite.spritecollide(self, coin_group, True):
                 coincount += 1
                 print(coincount)
+                return coincount'''
             #update player position 
             self.rect.x += dx
             self.rect.y += dy
@@ -304,8 +306,8 @@ world_datalvl1 = [
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 2, 6, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 [1, 6, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 1], 
 [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
@@ -329,7 +331,7 @@ world_datalvl2 = [
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
 [1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
 ]
@@ -390,21 +392,37 @@ while runtime == 1:
     else:
         
         if level == 1:
+            world_load = world_datalvl1
             world = World(world_datalvl1)
         if level == 2:
-            world = World(world_datalvl2)
+            world_load = world_datalvl2
+            
+            world = World(world_load)
 
         world.draw()#draws the terrain on screen
             
         
-        
         if gameover == 0:
             meanboar_group.update()
-            
         
-        if pause.draw():
-            gamestate = "paused"
-            print(f"paused press")
+           
+        
+        for x, row in enumerate(world_load):
+            for y, item in enumerate(row):
+                if item == 5 and pygame.sprite.spritecollide(player_lab, coin_group, True):
+                    coincount += 1
+                    world_load[x][y] = 0
+        world_load = World(world_load)
+        world = world_load
+        
+        
+        '''
+            the above block of code does the following
+            1 checks the item in each row of the list world_load
+            2 checks if the item being looked at it 5, which renders the coin sprite and if its colliding
+            3 adds to the coin count variable
+            4 initializes world_load as an instance of of the world class, then updates world with the new value.
+            '''
        
        
        #gamestate checker
@@ -425,7 +443,6 @@ while runtime == 1:
             
             coin_group.draw(screen)
                 
-            
             meanboar_group.draw(screen)
               
             spikesup_group.draw(screen)
@@ -434,6 +451,7 @@ while runtime == 1:
             
             gameover = player_lab.update(gameover)
             
+                
             #player has died
             if gameover == - 1:
                 if restart.draw():
@@ -451,9 +469,15 @@ while runtime == 1:
         
         if gamestate == "win":
             screen.blit(winbanner_img, (600, 100))
+            if restart.draw():
+                    player_lab.reset(100, 150)
+                    gameover = 0
+                    gamestate = 'playing'
             next_lvl.draw()
-            if coingame_bttn.draw():
-                pass
+            print(coincount)
+            #if coingame_bttn.draw():
+            
+    
             
             
     #event handler including paused
