@@ -26,8 +26,6 @@ gameover = 0
 menustate = True
 gamestate = "playing"
 level = 0
-coincount = 0
-
 
 def draw_grid():
     for line in range(0, 30):
@@ -58,6 +56,7 @@ class Player():
     def update(self, gameover ):
         dx = 0 #these measure changes in position b4 they are updated in player pos
         dy = 0
+        coincount = 0
         walkrate = 35
         #keypress
         if gameover == 0:
@@ -132,6 +131,9 @@ class Player():
             if pygame.sprite.spritecollide(self, kennel_group, False):
                 gameover = 1
                 
+            if pygame.sprite.spritecollide(self, coin_group, True):
+                coincount += 1
+                print(coincount)
             #update player position 
             self.rect.x += dx
             self.rect.y += dy
@@ -420,13 +422,6 @@ while runtime == 1:
         if gamestate == "playing":
             #regular game loop
             player_lab.update(gameover)#calls the update method from the player class to draw the lab
-            
-            coin_group.draw(screen)
-            
-            #update coin count and check if coins is collected
-            if pygame.sprite.spritecollide(player_lab, coin_group, True):
-                coin_group.update()
-                coincount += 1
             
             coin_group.draw(screen)
                 
