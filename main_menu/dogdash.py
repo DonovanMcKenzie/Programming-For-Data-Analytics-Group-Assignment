@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 from pygame.locals import *
-import pickle
+
 
 pygame.init()
 #initializes pygames modules for actual game functions
@@ -26,6 +26,7 @@ gameover = 0
 menustate = True
 gamestate = "playing"
 level = 0
+coincount = 0
 
 
 def draw_grid():
@@ -46,6 +47,8 @@ exitgame = pygame.image.load('dd_assets/gamequit.png')
 level1img = pygame.image.load('dd_assets/level1_img.png')
 level2img = pygame.image.load('dd_assets/level2_img.png')
 winbanner_img = pygame.image.load('dd_assets/game win.png')
+nextlvl_img = pygame.image.load('dd_assets/nextlvl.png')
+coingame_img = pygame.image.load('dd_assets/coingame.png')
 
 
 class Player():
@@ -202,6 +205,9 @@ class World():
                     #creating an instance of the spikes class
                     spikesup = Spikes(col_count * tile_size, row_count * tile_size + (tile_size // 2))
                     spikesup_group.add(spikesup)
+                if tile == 5:
+                    coin = Coin(col_count * tile_size + (tile_size // 2), row_count * tile_size + (tile_size // 2))
+                    coin_group.add(coin)
                 if tile == 6:
                     kennel = Kennel(col_count * tile_size, row_count * tile_size)
                     kennel_group.add(kennel)
@@ -248,6 +254,15 @@ class Kennel(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        coin_img = pygame.image.load('dd_assets/coin.png')
+        self.image = pygame.transform.scale(coin_img, (tile_size // 2 , tile_size // 2))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+      
             
             
 class Button():
@@ -331,9 +346,15 @@ level1_bttn = Button(100, 100, level1img)
 level2_bttn = Button(200, 200, level2img)
 
 player_lab = Player(100, screen_height - 90)
+
 meanboar_group = pygame.sprite.Group()
 spikesup_group = pygame.sprite.Group()
 kennel_group = pygame.sprite.Group()
+coin_group = pygame.sprite.Group()
+
+
+next_lvl = Button(800, 300, nextlvl_img)
+coingame_bttn = Button(800, 400, coingame_img)
 
 #game paths
 curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -377,6 +398,7 @@ while runtime == 1:
         
         if gameover == 0:
             meanboar_group.update()
+            
         
         if pause.draw():
             gamestate = "paused"
@@ -399,6 +421,15 @@ while runtime == 1:
             #regular game loop
             player_lab.update(gameover)#calls the update method from the player class to draw the lab
             
+            coin_group.draw(screen)
+            
+            #update coin count and check if coins is collected
+            if pygame.sprite.spritecollide(player_lab, coin_group, True):
+                coin_group.update()
+                coincount += 1
+            
+            coin_group.draw(screen)
+                
             
             meanboar_group.draw(screen)
               
@@ -424,9 +455,12 @@ while runtime == 1:
                 gamestate = "win"
         
         if gamestate == "win":
-            screen.blit(winbanner_img, (100, 100))
-    
-    
+            screen.blit(winbanner_img, (600, 100))
+            next_lvl.draw()
+            if coingame_bttn.draw():
+                pass
+            
+            
     #event handler including paused
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
