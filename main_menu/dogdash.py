@@ -22,6 +22,7 @@ pygame.display.set_caption('Dog Dash')
 
 #stylistic variables
 font_show = pygame.font.SysFont('Calibri', 50)
+font_show2 = pygame.font.SysFont('Calibri', 30)
 white = (255, 255, 255)
 
 #allows me to display text to the screen that can change without me needing multiple images to import
@@ -38,16 +39,10 @@ gamestate = "playing"
 level = 0
 coincount = 0
 
-def draw_grid():
-    for line in range(0, 30):
-        pygame.draw.line(screen, (255, 255, 255), (0, line * tile_size), (screen_width, line * tile_size))
-        pygame.draw.line(screen, (255, 255, 255), (line * tile_size, 0), (line * tile_size, screen_height))
-
 
 
 #loaded images below
 lvlbg = pygame.image.load('dd_assets/mainlvlbg.png')
-restart_img = pygame.image.load('dd_assets/restartimg.png')
 back_img = pygame.image.load('dd_assets/back bttn.png')
 pause_bttn = pygame.image.load('dd_assets/pause.png')
 unpause_bttn = pygame.image.load('dd_assets/unpause.png')
@@ -73,7 +68,7 @@ class Player():
         if gameover == 0:
             key = pygame.key.get_pressed()
             if key[pygame.K_UP] and self.isjumping == 0 and self.airtime == False:
-                self.yvelocity = -14
+                self.yvelocity = -19
                 self.isjumping = 1
             if key[pygame.K_UP] == 0:
                 self.isjumping = 0
@@ -142,10 +137,7 @@ class Player():
             if pygame.sprite.spritecollide(self, kennel_group, False):
                 gameover = 1
                 
-            '''if pygame.sprite.spritecollide(self, coin_group, True):
-                coincount += 1
-                print(coincount)
-                return coincount'''
+            
             #update player position 
             self.rect.x += dx
             self.rect.y += dy
@@ -317,7 +309,7 @@ world_datalvl1 = [
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 2, 6, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 [1, 6, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 1], 
 [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1], 
@@ -327,34 +319,33 @@ world_datalvl1 = [
 [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-]
+] 
 
 world_datalvl2 = [
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 2, 2, 0, 7, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1], 
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 5, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0 , 2, 4, 2, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 , 2, 2, 2, 2, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 2, 4, 2, 2, 2 , 6, 0, 0, 0, 0, 1],
 [1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
 ]
 
 #instances
-restart = Button(650, 100, restart_img)
+
 back = Button(720, 200, back_img)
 pause = Button(1455, 6, pause_bttn)
 
 unpause = Button(100, 100, unpause_bttn)
 mainBttn = Button(200, 200, to_mainBttn)
-restart3 = Button(300, 300, restart_img)
 exitgamebttn = Button(400, 400, exitgame)
 
 
@@ -372,7 +363,7 @@ coin_group = pygame.sprite.Group()
 
 next_lvl = Button(800, 550, nextlvl_img)
 coingame_bttn = Button(800, 400, coingame_img)
-restart2 = Button(800, 250, restart_img)
+
 
 
 #game paths
@@ -411,13 +402,11 @@ while runtime == 1:
             world = World(world_datalvl1)
         if level == 2:
             world_load = world_datalvl2
-            world = World(world_load)
+            world = World(world_datalvl2)
 
         world.draw()#draws the terrain on screen
             
         
-        if gameover == 0:
-            meanboar_group.update()
         
         
         
@@ -444,11 +433,6 @@ while runtime == 1:
         if gamestate == "paused":
             if exitgamebttn.draw():
                 runtime = 0
-            
-            if restart3.draw():
-                player_lab.reset(100, 500)
-                gamestate = 'playing'
-                coincount = 0
                     
             if mainBttn.draw():
                 subprocess.Popen(["python", menu_path])
@@ -461,7 +445,7 @@ while runtime == 1:
             #regular game loop
             if level == 1:
                 print_text('Avoid Traps', font_show, white, 450, 550)
-            print_text('Avoid Traps', font_show, white, 450, 550)
+                print_text('Coins can be valued between 1 and 5', font_show2, white, 1010, 400)
             player_lab.update(gameover)#calls the update method from the player class to draw the lab
             
             coin_group.draw(screen)
@@ -477,10 +461,6 @@ while runtime == 1:
                 
             #player has died
             if gameover == - 1:
-                if restart.draw():
-                    player_lab.reset(100, screen_height - 90)
-                    gameover = 0
-                    coincount = 0
                     
                 if back.draw():
                     subprocess.Popen(["python", menu_path])
@@ -493,15 +473,11 @@ while runtime == 1:
         
         if gamestate == "win":
             screen.blit(winbanner_img, (600, 100))
-            if restart2.draw():
-                    player_lab.reset(100, 500)
-                    gameover = 0
-                    gamestate = 'playing'
+            
             if next_lvl.draw():
                 menustate = True
                 print("menu state")
-            if coingame_bttn.draw():
-                pass
+            
             
     
             
