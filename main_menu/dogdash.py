@@ -2,6 +2,7 @@ import pygame
 import os
 import subprocess
 import sys
+import random
 from pygame.locals import *
 
 
@@ -68,7 +69,7 @@ class Player():
         if gameover == 0:
             key = pygame.key.get_pressed()
             if key[pygame.K_UP] and self.isjumping == 0 and self.airtime == False:
-                self.yvelocity = -19
+                self.yvelocity = -16
                 self.isjumping = 1
             if key[pygame.K_UP] == 0:
                 self.isjumping = 0
@@ -328,9 +329,9 @@ world_datalvl2 = [
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
-[1, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
-[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 5, 0, 0, 0, 1],
+[1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0 , 2, 4, 2, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 , 2, 2, 2, 2, 0, 1],
@@ -413,7 +414,7 @@ while runtime == 1:
         for x, row in enumerate(world_load):
             for y, item in enumerate(row):
                 if item == 5 and pygame.sprite.spritecollide(player_lab, coin_group, True):
-                    coincount += 1
+                    coincount = coincount + random.randint(1, 5)
                     world_load[x][y] = 0
                 print_text('Coins Collected: ' +str(coincount), font_show, white, tile_size - 10, 10)
         world_load = World(world_load)
