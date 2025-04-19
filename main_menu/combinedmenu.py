@@ -32,6 +32,7 @@ dominoes_img = pygame.image.load('main_menu_assets\dominoes selecbttn.png')
 snekNladder_img = pygame.image.load('main_menu_assets\Snakes n ladders selecbttn.png')
 ach_img = pygame.image.load('main_menu_assets/achievements.png')
 back_img = pygame.image.load('main_menu_assets/back bttn.png')
+jumpimg = pygame.image.load('main_menu_assets/jumperimg.png')
 
 repo = 'https://github.com/DonovanMcKenzie/Programming-For-Data-Analytics-Group-Assignment'
 #link to repository for version info button
@@ -42,15 +43,16 @@ start_bttn = buttons.Button(588, 327, start_img)
 quit_bttn = buttons.Button(621, 460, quit_img)
 vinfo = buttons.Button(4, 702, vinfo_img)
 #game select vv
-dd_bttn = buttons.Button( 300, 270 , dogdash_img)
+dd_bttn = buttons.Button( 200, 270 , dogdash_img)
 dominoes_bttn = buttons.Button( 730, 270, dominoes_img)
 snek_bttn = buttons.Button( 730, 430, snekNladder_img)
 ach_bttn = buttons.Button(36, 37, ach_img)
 back_bttn = buttons.Button(638, 600, back_img)
+jump_bttn = buttons.Button (200, 430, jumpimg)
 
 #game paths
 curr_dir = os.path.dirname(os.path.abspath(__file__))
-dogdash_path = os.path.join(curr_dir, "dogdash.py")
+
 
 
 runtime = 1
@@ -82,12 +84,20 @@ while runtime == 1:
             dogdash_path = os.path.join(curr_dir, "dogdash.py")
             subprocess.Popen(["python", dogdash_path])
             runtime = 0
-    
+        
+        if jump_bttn.draw(screen):
+            jump_path = os.path.join(curr_dir, "jumper.py")
+            subprocess.Popen(["python", jump_path])
+            runtime = 0
+        
         if snek_bttn.draw(screen):
-            print(f"snek")
+            snek_path = os.path.join(curr_dir, "snakes_and_ladders.py")
+            subprocess.Popen(["python", snek_path])
+            runtime = 0
     
         if dominoes_bttn.draw(screen):
-            print(f"domino")
+            pass
+        
         if back_bttn.draw(screen):
             menustate = "main"
     
