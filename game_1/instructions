@@ -1,0 +1,28 @@
+ Objective:
+Be the first player to reach tile 100 by rolling the dice and moving your token across the board. Avoid the snakes and climb up ladders to get ahead!
+
+Rules:
+-Players take turns rolling a six-sided dice (1–6).
+
+-The number you roll is the number of tiles you move forward.
+
+-If you land on the bottom of a ladder, you climb up to the top of it.
+
+-If you land on the head of a snake, you slide down to its tail.
+
+-You must land exactly on tile 100 to win. If your roll goes past it, you stay in the same spot.
+
+-First player to reach tile 100 wins!
+
+Controls:
+
+-Press SPACE to roll the dice on your turn.
+
+-Two players alternate turns.
+
+-You’ll see your name and current tile on the screen.
+
+-After one game, you’ll be asked if you want to play again.
+
+-The program tracks your scores and shows statistics (mean, mode, etc.) if you play multiple rounds!
+
