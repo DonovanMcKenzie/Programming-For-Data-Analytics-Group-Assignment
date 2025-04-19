@@ -9,7 +9,7 @@ pygame.init()
 #initializes pygames modules for actual game functions
 
 clock = pygame.time.Clock()
-fps = 60
+fps = 240
 #initalizes an ingame clock and frame rate to control how often the gameplay loop runs
 
 screen_width = 1500
@@ -20,11 +20,21 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Dog Dash')
 #constructs the screen, names the window
 
+#stylistic variables
+font_show = pygame.font.SysFont('Calibri', 50)
+white = (255, 255, 255)
+
+#allows me to display text to the screen that can change without me needing multiple images to import
+def print_text(text, font, textcolour, x, y):
+    image = font.render(text, True, white)
+    screen.blit(image, (x,y))
+
+
 #gamevariables below credits to AxulArt @ https://axulart.itch.io/dirt-grass-2d-platform-tileset-ver-2
 tile_size = 50
 gameover = 0
 menustate = True
-gamestate = "win"
+gamestate = "playing"
 level = 0
 coincount = 0
 
@@ -147,7 +157,7 @@ class Player():
         
         #draws the instance of the player to the screen
         screen.blit(self.image, self.rect)
-        pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
+        #pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
         
         return gameover
     
@@ -175,6 +185,7 @@ class Player():
         self.isjumping = 0
         self.facing = 0
         self.airtime = True
+
 
 class World():
     def __init__(self, data):
@@ -221,7 +232,7 @@ class World():
     def draw(self):
         for tile in self.tile_list:
             screen.blit(tile[0], tile[1])
-            pygame.draw.rect(screen, (255, 255, 255), tile[1], 2)
+            #pygame.draw.rect(screen, (255, 255, 255), tile[1], 2)
 
 class Baddies1(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -343,11 +354,13 @@ pause = Button(1455, 6, pause_bttn)
 
 unpause = Button(100, 100, unpause_bttn)
 mainBttn = Button(200, 200, to_mainBttn)
-exitgamebttn = Button(300, 300, exitgame)
+restart3 = Button(300, 300, restart_img)
+exitgamebttn = Button(400, 400, exitgame)
 
 
 level1_bttn = Button(100, 100, level1img)
 level2_bttn = Button(200, 200, level2img)
+quitlvlslct = Button(300, 300, exitgame)
 
 player_lab = Player(100, screen_height - 90)
 
@@ -357,8 +370,10 @@ kennel_group = pygame.sprite.Group()
 coin_group = pygame.sprite.Group()
 
 
-next_lvl = Button(800, 300, nextlvl_img)
+next_lvl = Button(800, 550, nextlvl_img)
 coingame_bttn = Button(800, 400, coingame_img)
+restart2 = Button(800, 250, restart_img)
+
 
 #game paths
 curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -387,7 +402,7 @@ while runtime == 1:
         if level2_bttn.draw():
             level = 2
             menustate = False
-        if exitgamebttn.draw():
+        if quitlvlslct.draw():
                 runtime = 0
     else:
         
@@ -396,7 +411,6 @@ while runtime == 1:
             world = World(world_datalvl1)
         if level == 2:
             world_load = world_datalvl2
-            
             world = World(world_load)
 
         world.draw()#draws the terrain on screen
@@ -405,16 +419,17 @@ while runtime == 1:
         if gameover == 0:
             meanboar_group.update()
         
-           
+        
         
         for x, row in enumerate(world_load):
             for y, item in enumerate(row):
                 if item == 5 and pygame.sprite.spritecollide(player_lab, coin_group, True):
                     coincount += 1
                     world_load[x][y] = 0
+                print_text('Coins Collected: ' +str(coincount), font_show, white, tile_size - 10, 10)
         world_load = World(world_load)
         world = world_load
-        
+    
         
         '''
             the above block of code does the following
@@ -430,6 +445,11 @@ while runtime == 1:
             if exitgamebttn.draw():
                 runtime = 0
             
+            if restart3.draw():
+                player_lab.reset(100, 500)
+                gamestate = 'playing'
+                coincount = 0
+                    
             if mainBttn.draw():
                 subprocess.Popen(["python", menu_path])
                 runtime = 0
@@ -439,6 +459,9 @@ while runtime == 1:
             
         if gamestate == "playing":
             #regular game loop
+            if level == 1:
+                print_text('Avoid Traps', font_show, white, 450, 550)
+            print_text('Avoid Traps', font_show, white, 450, 550)
             player_lab.update(gameover)#calls the update method from the player class to draw the lab
             
             coin_group.draw(screen)
@@ -457,11 +480,12 @@ while runtime == 1:
                 if restart.draw():
                     player_lab.reset(100, screen_height - 90)
                     gameover = 0
+                    coincount = 0
                     
                 if back.draw():
                     subprocess.Popen(["python", menu_path])
                     runtime = 0
-                    
+                                        
             #level complete?
             if gameover == 1:
                 #display win screen, compute coins collected, offer coin minigame
@@ -469,13 +493,15 @@ while runtime == 1:
         
         if gamestate == "win":
             screen.blit(winbanner_img, (600, 100))
-            if restart.draw():
-                    player_lab.reset(100, 150)
+            if restart2.draw():
+                    player_lab.reset(100, 500)
                     gameover = 0
                     gamestate = 'playing'
-            next_lvl.draw()
-            print(coincount)
-            #if coingame_bttn.draw():
+            if next_lvl.draw():
+                menustate = True
+                print("menu state")
+            if coingame_bttn.draw():
+                pass
             
     
             
